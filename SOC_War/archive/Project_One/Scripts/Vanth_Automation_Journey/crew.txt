@@ -1,0 +1,3 @@
+name:rank:location
+vanth:warden:cli
+shadow:sentry:infra

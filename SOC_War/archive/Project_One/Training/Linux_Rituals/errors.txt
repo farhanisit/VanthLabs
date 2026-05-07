@@ -1,0 +1,1 @@
+ls: /notathing: No such file or directory

@@ -1,0 +1,45 @@
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^RITUAL_032.MD^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+## Commands & Observations
+- Typo caught: `find .-iname` → must be `find . -iname`.
+- On default macOS (case-insensitive APFS):
+  - Only one file can exist per directory differing by case.
+  - `find -name` is case-sensitive; `find -iname` is case-insensitive.
+  - I matched `./Alpha.txt` (here) and `./test_arena/backup_zone/alpha.txt` (different folder).
+**Lesson:** Code as if the world is case-sensitive; use `-iname` only when you truly want case-insensitive search.
+
+
+Points: What Happened
+
+|||>>>>>>find . -iname "alpha.txt" matched two files:
+
+./Alpha.txt (in your current directory, capital A).
+
+|||________./test_arena/backup_zone/alpha.txt (inside a subfolder, lowercase a).
+
+So:
+
+Both exist, but not in the same folder.
+
+Case difference is preserved (the filesystem remembers).
+
+Your Mac’s APFS volume is case-insensitive by default, so if you tried touch Alpha.txt and touch alpha.txt in the same directory, only one would survive.
+
+⚔️ Lesson for Ritual_032.md
+
+Different directories can contain files that differ only by case.
+
+Same directory cannot (on your default macOS volume).
+
+find -iname is your case-insensitive finder; find -name is strict.
+
+^^^^^^^^Reflection Entry^^^^^^^^^^^^
+
+I confirmed that `find -iname` ignores case.  |
+
+It matched both `Alpha.txt` and `alpha.txt` in different folders.|  
+
+This proves macOS preserves case but doesn’t allow case-sensitive coexistence in one directory.|
+  
+The Sentinel must always script as if the world is case-sensitive, or risk scripts breaking when moved to Linux servers.|||

@@ -1,0 +1,28 @@
+:Development:Flutter
+Android Studio.app
+android-studio-2024.3.1.13-mac_arm.dmg
+Canva.app
+Chatbot.app
+flutter 2
+GarageBand.app
+Google Chrome.app
+iMovie.app
+Installers
+Keynote.app
+Microsoft Edge.app
+Microsoft Excel.app
+Microsoft Outlook.app
+Microsoft Word.app
+Notability.app
+Numbers.app
+Pages.app
+Prime Video.app
+ResearchGate.app
+Safari.app
+Screenshot 2025-04-11 at 18.51.42.png
+Spotify
+Spotify.app
+Telegram.app
+Utilities
+WhatsApp.app
+Xcode.app

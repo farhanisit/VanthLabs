@@ -1,0 +1,4 @@
+total 16
+-rw-r--r--  1 farhanahmed  staff     0 May 16 18:03 file_list.txt
+-rw-r--r--  1 farhanahmed  staff  1475 May 16 17:59 ritual_011.md
+-rw-r--r--  1 farhanahmed  staff    48 May 16 18:02 ritual_log.txt

@@ -1,0 +1,46 @@
+================================================================================
+VANTH SOC DETECTION RULES — QUICK REFERENCE
+================================================================================
+
+RULE # | PATTERN                          | MITRE TECH    | SEVERITY | STATUS
+-------+----------------------------------+---------------+----------+--------
+  #1   | Brute Force (5+ failed + 1 succ) | T1110         | HIGH     | LIVE ✅
+  #2   | Shadow File Access via Sudo      | T1548.004     | CRITICAL | LIVE ✅
+  #3   | Lateral Movement (Multi-IP)      | T1021         | HIGH     | LIVE ✅
+  #4   | Data Exfiltration (Large File)   | T1041         | CRITICAL | LIVE ✅
+  #5   | Sudo Access Sensitive Files      | T1548.004     | HIGH     | LIVE ✅
+  #6   | Account Lockout (5+ failed)      | T1110         | MEDIUM   | LIVE ✅
+  #7   | Unusual SSH Port Activity        | T1571         | HIGH     | LIVE ✅
+  #8   | Account Takeover (Lock→Success)  | T1110.003     | CRITICAL | LIVE ✅
+
+================================================================================
+KILL CHAIN COVERAGE
+================================================================================
+
+Reconnaissance:        [NOT COVERED]
+Exploitation:          Rules #1, #2, #5, #7 (credential + privilege escalation)
+Persistence:          [PLANNED: Rule #9]
+Command & Control:    Rules #3, #7 (lateral movement + alternate ports)
+Exfiltration:         Rule #4 (data theft)
+Impact/Post-Comp:     Rules #6, #8 (account compromise detection)
+
+================================================================================
+DEPLOYMENT STATUS
+================================================================================
+
+Platform:      Splunk Enterprise 10.2.2 (localhost:8000)
+Alerts:        Configured (Email to farhanahmed1947@gmail.com)
+Schedule:      Weekly, Monday 6:00 AM
+Test Status:   All 8 rules tested with synthetic data ✅
+Production:    Ready for deployment
+
+================================================================================
+NEXT PHASE: RULES #9-11 (Kill Chain Completion)
+================================================================================
+
+#9 - Persistence Detection          (Cron jobs, new users, SSH keys)
+#10 - C2 Beaconing Pattern          (Regular outbound intervals)
+#11 - Process Injection Detection   (Parent-child process anomalies)
+
+Target: Complete by May 16, 2026
+================================================================================
