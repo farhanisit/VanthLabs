@@ -147,3 +147,65 @@ different result than 'where' before 'top'. Filter first, then top.
 ### Next session
 Continue series: "Use aggregation functions" (summarize, count(), avg, etc.)
 Then map each KQL operator to its Splunk SPL equivalent.
+
+## Hands-On Session 02 — KQL Aggregation Functions
+Source: Microsoft Learn — "Tutorial: Use aggregation functions"
+Environment: dataexplorer.azure.com, help cluster, StormEvents table
+
+### Operators & Functions Covered
+count()              - count all rows
+countif(condition)   - count rows where condition is true
+avg()                - average of a column
+min()                - minimum value
+max()                - maximum value
+sum()                - sum of a column
+bin(col, interval)   - group values into time/size buckets
+render barchart      - visualize as bar chart
+render piechart      - visualize as pie chart
+render timechart     - visualize as time series
+
+### LESSON 4 — summarize without grouping = one bucket
+countif(DamageCrops > 0)            -> returns 1491 (total across ALL states)
+countif(DamageCrops > 0) by State   -> returns one row per state
+RULE: no 'by' clause = entire table collapses into one row.
+
+### LESSON 5 — count() vs sum() — critical distinction
+count()        = how many EVENTS (rows) matched
+sum(column)    = total VALUE across those rows
+Changing the filter threshold (e.g. > 100 vs > 10M) affects count().
+To measure actual damage: use sum(DamageCrops), not count().
+On the job: this distinction causes dashboard misreads. Slow down and check.
+
+### LESSON 6 — Adding columns to 'by' increases granularity
+by State                        -> ~67 rows (one per state)
+by State, bin(StartTime, 7d)    -> 218 rows (one per state per week)
+Every column added to 'by' = more specific groups = more output rows.
+
+### LESSON 7 — render changes the question, not the data
+render barchart  -> "how many events happened?"
+render piechart  -> "what share does each group represent?"
+render timechart -> "how did this change over time?"
+Same data. Same query. Different render = different analytical question.
+
+### LESSON 8 — Anomaly detection instinct
+Max = Min = Avg = same value -> only one record exists, OR all values identical.
+This is a data quality / anomaly signal. Note it, investigate it.
+
+### LESSON 9 — sort vs top
+sort by X desc   -> organises all rows, no limit
+top N by X       -> limits AND sorts in one step
+sort by StartTime asc -> restores chronological order when dates look chaotic
+
+### Key Pattern: Time-bucketed anomaly hunting
+StormEvents
+| where DamageCrops > 10099999
+| summarize EventCount = count() by bin(StartTime, 7d)
+| render timechart
+Plain English: "During which weeks did extreme crop-damage storms cluster?"
+This is your first real anomaly-hunting style query.
+
+### SPL → KQL Bridge (aggregation layer)
+| stats count by State       -> | summarize count() by State
+| stats avg(X) by Y          -> | summarize avg(X) by Y
+| timechart count            -> | summarize count() by bin(T,1h) | render timechart
+| eval col = ...             -> | extend col = ...
