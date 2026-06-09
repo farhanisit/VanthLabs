@@ -1,0 +1,10 @@
+Jun 08 06:41:12 WKSTN-04 sshd[2291]: Failed password for mlopez from 45.33.32.156 port 51890 ssh2
+Jun 08 06:41:13 WKSTN-04 sshd[2291]: Failed password for mlopez from 45.33.32.156 port 51891 ssh2
+Jun 08 06:41:14 WKSTN-04 sshd[2291]: Failed password for admin from 45.33.32.156 port 51892 ssh2
+Jun 08 06:41:17 WKSTN-04 sshd[2291]: Accepted password for mlopez from 45.33.32.156 port 51895 ssh2
+Jun 08 06:41:18 WKSTN-04 sshd[2291]: pam_unix(sshd:session): session opened for user mlopez
+Jun 08 06:42:01 WKSTN-04 sshd[2291]: Failed password for root from 185.220.101.47 port 44321 ssh2
+Jun 08 06:42:02 WKSTN-04 sshd[2291]: Failed password for root from 185.220.101.47 port 44322 ssh2
+Jun 08 06:42:03 WKSTN-04 sshd[2291]: Failed password for root from 185.220.101.47 port 44323 ssh2
+Jun 08 06:42:04 WKSTN-04 sshd[2291]: Accepted password for root from 185.220.101.47 port 44324 ssh2
+Jun 08 06:43:11 WKSTN-04 sudo[3301]: mlopez : TTY=pts/0 ; PWD=/home/mlopez ; USER=root ; COMMAND=/bin/bash
