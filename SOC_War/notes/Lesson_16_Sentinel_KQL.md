@@ -209,3 +209,41 @@ This is your first real anomaly-hunting style query.
 | stats avg(X) by Y          -> | summarize avg(X) by Y
 | timechart count            -> | summarize count() by bin(T,1h) | render timechart
 | eval col = ...             -> | extend col = ...
+
+## Session 04 — Aggregation Module Complete (11 June 2026)
+Completed: make_set(), case(), bin(), sliding window concept
+
+### make_set()
+Creates array of unique values from grouped rows
+StormEvents | where DeathsDirect > 0
+| summarize StormTypesWithDeaths = make_set(EventType) by State
+| sort by array_length(StormTypesWithDeaths)
+
+### case()
+Conditional bucketing — IF/ELSE IF/ELSE logic
+extend InjuriesBucket = case(
+    InjuriesCount > 50, "Large",
+    InjuriesCount > 10, "Medium",
+    InjuriesCount > 0,  "Small",
+    "No injuries")
+
+### Sliding Window vs Fixed Window
+bin(TimeGenerated, 7d)  = fixed buckets (Week1, Week2, Week3)
+sliding window          = rolling calculation (Days1-7, Days2-8, Days3-9)
+SOC use: failed login trends, alert volume baselines, DNS activity spikes
+
+### Key insight locked today
+Changing the population changes the percentages.
+Filter before summarize = different story than filter after summarize.
+Temporary columns (from summarize) are available to all downstream operators.
+
+### Lesson 16 operator checklist — COMPLETE
+where, project, extend, sort, top, render
+summarize, count(), countif(), sum(), avg(), min(), max()
+make_set(), case(), bin(), toscalar(), todouble()
+Sliding window (concept) — implementation next session
+
+### Next: Lesson 16.1
+Move off StormEvents tutorial data onto real Sentinel tables:
+SecurityEvent, SigninLogs, DeviceEvents
+Build actual threat hunting queries — brute force, account compromise
