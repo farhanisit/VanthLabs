@@ -247,3 +247,44 @@ Sliding window (concept) — implementation next session
 Move off StormEvents tutorial data onto real Sentinel tables:
 SecurityEvent, SigninLogs, DeviceEvents
 Build actual threat hunting queries — brute force, account compromise
+
+## Session 05 — Join Data from Multiple Tables (13 June 2026)
+Source: Microsoft Learn — "Tutorial: Join data from multiple tables"
+
+### Core concept
+JOIN = combine two tables using a common column (matching key)
+      to add context/data that the first table didn't have
+
+Event table  = source of what happened (logs, telemetry)
+Context table = source of extra information (user info, device info)
+Matching key  = column that exists in BOTH tables
+
+### join vs lookup
+join   = full flexibility, multiple kinds (inner, left, right, anti)
+lookup = simplified join, optimised for enriching a fact table
+         with columns from a smaller context/dimension table
+Use lookup when you just want to add context columns.
+Use join when the table relationship is complex.
+
+### SOC translation
+SigninLogs | join EmployeeDirectory on UserPrincipalName
+→ adds Department, Manager, Location to login events
+
+DeviceEvents | join DeviceInfo on DeviceId  
+→ adds OS, owner, risk level to endpoint events
+
+FailedLogins | join UserDirectory on Username
+→ adds Department to brute force investigation
+
+### join kinds
+kind=inner         = only rows that match in BOTH tables
+kind=innerunique   = inner join, deduplicates right table matches
+kind=leftouter     = all left rows, matching right rows (nulls if no match)
+kind=anti          = rows in left that have NO match in right
+                     (find users with no MFA registered, etc.)
+
+### Notebook card
+JOIN = attach context from Table B onto Table A using a shared column
+lookup = simple enrichment join (fact table + dimension table)
+join   = flexible multi-kind joining
+Matching key = the column both tables share
