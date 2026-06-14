@@ -288,3 +288,43 @@ JOIN = attach context from Table B onto Table A using a shared column
 lookup = simple enrichment join (fact table + dimension table)
 join   = flexible multi-kind joining
 Matching key = the column both tables share
+
+## Session 06 — Real Security Detection Queries (14 June 2026)
+Dataset: help.SecurityLogs (Azure Data Explorer)
+Tables: AuthenticationEvents, ProcessEvents, FileCreationEvents,
+        PassiveDns, Email, InboundBrowsing, OutboundBrowsing, Employees
+
+### Detection Query 1 — Brute Force Detection
+AuthenticationEvents
+| where result == "Failed Login"
+| summarize FailCount = count() by username
+| where FailCount >= 5
+| sort by FailCount desc
+Result: 106 accounts with 5+ failed logins. jadenman top at 22.
+
+### Detection Query 2 — Account Takeover (Failures + Successful Login)
+let failures = AuthenticationEvents
+| where result == "Failed Login"
+| summarize FailedCount = count() by username
+| where FailedCount >= 5;
+let successes = AuthenticationEvents
+| where result == "Successful Login"
+| summarize SuccessCount = count() by username
+| where SuccessCount >= 1;
+failures
+| join kind=inner successes on username
+| project username, SuccessCount, FailedCount
+| sort by FailedCount desc
+Result: 97 accounts — failed logins AND at least one success.
+
+### Analyst triage logic
+Low success rate (jadenman 2/22 = 9%) = brute force/credential stuffing
+High success rate = misconfigured app or legitimate user issue
+Priority: low success rate + high failure count = investigate first
+
+### Lessons locked this session
+- case sensitivity burned again: "Failed login" vs "Failed Login"
+- let = named sub-query, reusable in the same query
+- join kind=inner = only usernames in BOTH tables survive
+- ratio matters more than raw count in triage
+- two where clauses in one query = filter rows THEN filter aggregated results
