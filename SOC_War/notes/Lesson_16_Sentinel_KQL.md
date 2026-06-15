@@ -328,3 +328,46 @@ Priority: low success rate + high failure count = investigate first
 - join kind=inner = only usernames in BOTH tables survive
 - ratio matters more than raw count in triage
 - two where clauses in one query = filter rows THEN filter aggregated results
+
+## Session 07 — Process-Based Detection & Multi-Table Investigation (15 June 2026)
+Dataset: help.SecurityLogs — ProcessEvents + AuthenticationEvents + Employees
+
+### Detection Query 3 — Suspicious Process Execution
+ProcessEvents
+| where parent_process_name in~ ("cmd.exe", "sc.exe")
+| where process_name in~ ("dumpit.exe", "svchost.exe", "browser-broker.exe")
+Result: 164 records. dumpit.exe on two machines — eumatesic, mamarenco.
+
+### Detection Query 4 — Account Login History for Suspects
+AuthenticationEvents
+| where username in~ ("eumatesic", "mamarenco")
+| project timestamp, src_ip, username, result
+| sort by username, timestamp asc
+Result: 4 records. mamarenco logged in from public IP same day dumpit.exe ran.
+
+### Incident Timeline Reconstructed
+2022-01-04 20:21  eumatesic   Failed Login (197.105.126.4)
+2022-01-04 20:23  mamarenco   Successful Login (21.231.42.132 — public IP)
+2022-01-04        mamarenco   dumpit.exe executed from Desktop path
+2022-01-07        mamarenco   Login from 192.168.0.221 (internal — lateral movement?)
+
+### Attack Pattern Identified
+Stage 1: Brute force / credential attack (AuthenticationEvents)
+Stage 2: Successful login from external IP
+Stage 3: Memory dumping tool executed (credential harvesting)
+Stage 4: Internal login 3 days later (lateral movement)
+Type: Brute force → credential dumping → lateral movement
+Severity: Critical — attacker may still be in the system
+L1 Action: Document → escalate to L2. Do NOT contain yourself.
+
+### Key Concepts Locked
+in~  = case-insensitive list match (list version of =~)
+Parent-child rule: if parent doesn't make sense for the child, investigate
+Normal: services.exe → svchost.exe
+Suspicious: cmd.exe → svchost.exe OR sc.exe → dumpit.exe
+Plain English first, syntax second — always
+
+### Process Suspicion Rule (interview answer)
+A process is suspicious when it breaks the expected parent-child relationship.
+Every legitimate process has a normal parent.
+If the parent doesn't make sense for the child — investigate.
