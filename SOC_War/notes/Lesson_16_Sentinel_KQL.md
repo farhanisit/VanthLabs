@@ -371,3 +371,65 @@ Plain English first, syntax second — always
 A process is suspicious when it breaks the expected parent-child relationship.
 Every legitimate process has a normal parent.
 If the parent doesn't make sense for the child — investigate.
+
+## Session 08 — PassiveDNS & C2 Detection (17 June 2026)
+Dataset: help.SecurityLogs — PassiveDns table
+Columns: ip, domain only (NO timestamp — limits beaconing analysis)
+
+### Detection Query 5 — Volume Clustering (domains per IP)
+PassiveDns
+| summarize DomainCount = dcount(domain) by ip
+| where DomainCount > 1
+| sort by DomainCount desc
+Result: top IP (117.248.235.33) resolved 8 different domains.
+
+### Detection Query 6 — Theme Clustering (see actual domain names)
+PassiveDns
+| summarize DomainList = make_set(domain) by ip
+| extend DomainCount = array_length(DomainList)
+| where DomainCount > 1
+| sort by DomainCount desc
+Result: revealed domain names, not just counts.
+
+### Bug caught: naming mismatch
+Variable created on left of '=' must match name used later.
+| summarize DomainCount = make_set(domain) by ip   <- wrong name
+| extend DomainCount = array_length(DomainList)    <- DomainList undefined
+Fix: name the make_set column DomainList, count column DomainCount separately.
+
+### Two clustering patterns identified
+1. Volume clustering — one IP serving many unrelated domains
+   (dcount) — flags infrastructure reuse
+2. Theme clustering — domains share a lure word (verify/scan/alert/medical)
+   (make_set + read names) — flags coordinated phishing/C2 campaigns
+
+### DGA vs themed-lure distinction
+DGA domains: random gibberish (monomialimpure.com, confinementsfosters.net)
+             = automated malware C2, no human readability needed
+Themed-lure domains: real words recombined (scan-verify.com, update-install.info)
+             = social-engineering-aware infrastructure, designed to look legitimate
+
+### Triage priority rule
+Lure relevance to the organization > raw domain/IP count.
+A small, perfectly-targeted campaign (matches your industry) is often
+more dangerous than a large generic one.
+
+### Data limitation lesson (real-world SOC skill)
+PassiveDns has no timestamp column -> cannot do beaconing/interval analysis here.
+Correct analyst move: document the limitation, do NOT force a workaround.
+Recommend cross-referencing OutboundBrowsing or firewall logs for timing data.
+
+### New functions locked
+dcount(column)       = distinct count (count() variant for unique values)
+make_set(column)     = collect unique values into an array, grouped
+array_length(array)  = number of items in an array
+
+## Notebook Card
+PassiveDNS Detection
+dcount(domain) by ip   = how many domains per IP
+make_set(domain) by ip = WHICH domains (see the names)
+array_length(list)     = count items in that list
+Volume clustering: 1 IP, many domains = suspicious
+Theme clustering: shared words (verify/scan/alert) = social engineering C2
+DGA: random gibberish domains = automated malware C2
+Priority = lure relevance to org > raw domain count
