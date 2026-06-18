@@ -433,3 +433,42 @@ Volume clustering: 1 IP, many domains = suspicious
 Theme clustering: shared words (verify/scan/alert) = social engineering C2
 DGA: random gibberish domains = automated malware C2
 Priority = lure relevance to org > raw domain count
+
+## Session 09 — FileCreationEvents & Cross-Table Correlation (18 June 2026)
+Dataset: help.SecurityLogs — FileCreationEvents table
+Columns: timestamp, hostname, sha256, path, filename, size
+
+### Data limitation 3 — confirmed, same dataset
+1. size column capped ~9999 bytes — no large files exist (tested >9999.9, >9990)
+2. filename/path contains "dump" — zero matches despite known dumpit.exe execution
+3. Cross-table time correlation (ProcessEvents join FileCreationEvents on hostname,
+   filtered to 0s < gap < 5s) — zero matches, query verified correct
+
+### Query built (correct, verified clean execution)
+ProcessEvents
+| where process_name contains "dumpit.exe"
+| join kind=inner (FileCreationEvents) on hostname
+| where todatetime(timestamp1) - todatetime(timestamp) > 0s
+  and todatetime(timestamp1) - todatetime(timestamp) < 5s
+
+### Conclusion
+FileCreationEvents in this sample dataset does not contain a record representing
+the dumpit.exe output file. Three independent angles (size, name/path, time
+correlation) all returned null. This is a genuine sample-data gap, not a query
+error — correct analyst response is to document and move on, not force a workaround.
+
+### Real techniques locked despite null result
+- join kind=inner on hostname: correlate two tables by shared entity
+- Post-join column collision: KQL auto-suffixes right-side duplicate columns (timestamp1)
+- todatetime(): explicit type cast required before datetime arithmetic —
+  columns can display as dates but still be StringBuffer/text underneath
+- timespan literals (5s, 1m, 1h) for duration comparisons
+- Dual-bound where clause (> 0s and < 5s) to express "after, but soon after"
+- Semantic Error "StringBuffer and StringBuffer" = both operands are untyped
+  text, not the type you assumed — always check actual column type before math
+
+### Real-world parallel
+Attacker behavioral signals (size, hash, naming) can fail in any single dataset
+due to scope/collection gaps — not because the technique is wrong. Layering
+multiple independent signals (which you did: size → name → correlation) is
+exactly how real investigations handle incomplete telemetry.
