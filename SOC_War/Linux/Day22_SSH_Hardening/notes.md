@@ -80,3 +80,20 @@ everyone else before reaching a password/key prompt at all.
 Deliberately skipped today to test changes incrementally
 rather than changing everything at once and risking multiple
 hidden failure points together.
+
+## AllowUsers Addition (LNX-025, completed separately)
+Added to /etc/ssh/sshd_config:
+AllowUsers ubuntu
+
+Whitelist control — only listed usernames may SSH in at all.
+Everyone else rejected BEFORE reaching the key/password stage.
+Fails closed. Shrinks attack surface from "every user on the
+box" to "only named users."
+
+Pre-change check: confirmed login username with `whoami`
+(ubuntu) — the account that MUST be whitelisted or lockout
+occurs on restart. AllowUsers whitelists by username, not key,
+so the critical pre-check is the username, not key existence.
+
+Verified: config syntax tested (sudo sshd -t) before restart,
+fresh connection confirmed after restart.
