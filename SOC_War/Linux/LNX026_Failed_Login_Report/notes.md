@@ -50,3 +50,57 @@ ip,failure_count,succeeded
 
 A real analyst deliverable — opens in Excel, attaches to a
 ticket, hands to L2 as evidence.
+
+## LNX-027 Enhancement — First Seen / Last Seen
+
+### Analyst Requirement
+
+For each suspicious IP, report:
+
+- failure count
+- whether authentication later succeeded
+- first failed-login timestamp
+- last failed-login timestamp
+
+### Logic Added
+
+Three dictionaries now track separate pieces of information:
+
+```python
+fail_counts = {}
+first_seen = {}
+last_seen = {}
+
+For each failed-login event:
+
+fail_counts[ip] = fail_counts.get(ip, 0) + 1
+
+if ip not in first_seen:
+    first_seen[ip] = timestamp
+
+last_seen[ip] = timestamp
+
+Plain English:
+
+Increase the failed-login count for the IP.
+Record the first timestamp only when the IP appears for the first time.
+Update the last timestamp every time the IP appears.
+Key Distinction
+
+first_seen is written once.
+
+last_seen is overwritten on every appearance, so the final stored value is the newest timestamp.
+
+CSV Output
+ip,failure_count,succeeded,first_seen,last_seen
+45.33.32.156,3,yes,06:41:12,06:41:14
+185.220.101.47,3,yes,06:42:01,06:42:03
+Weakness Identified
+
+The main difficulty was reading dictionary assignment syntax:
+
+first_seen[ip] = timestamp
+
+This means:
+
+Use the IP as the dictionary key and map it to the timestamp value.
