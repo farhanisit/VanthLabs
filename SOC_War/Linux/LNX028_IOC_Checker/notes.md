@@ -40,3 +40,27 @@ Sets are suitable because they keep unique values and make membership checks suc
 The main difficulty was converting the analyst requirement into Python structure without seeing the finished code first.
 
 I also needed reinforcement on indentation levels, the difference between `=` and `.add()`, and how each block ends before the next stage begins.
+
+
+## LNX-031 — Rejected IOC Audit Log
+
+The IOC checker now preserves malformed input instead of silently discarding it.
+
+Invalid entries are stored in `rejected_iocs` as tuples containing:
+
+- rejected value
+- source file
+- rejection reason
+
+A second report, `rejected_iocs.csv`, is generated with:
+
+value,source,reason
+
+Testing confirmed that malformed values from both observed_ips.txt and malicious_iocs.txt were rejected before IOC processing and recorded with the correct source.
+
+Final design:
+
+valid input   → IOC comparison → ioc_report.csv
+invalid input → audit record   → rejected_iocs.csv
+
+Main lesson: validation protects the processing pipeline, while audit logging preserves analyst visibility and supports troubleshooting.
