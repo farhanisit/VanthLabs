@@ -64,3 +64,20 @@ valid input   → IOC comparison → ioc_report.csv
 invalid input → audit record   → rejected_iocs.csv
 
 Main lesson: validation protects the processing pipeline, while audit logging preserves analyst visibility and supports troubleshooting.
+
+
+## LNX-032 — Specific IPv4 Rejection Reasons
+
+- Changed the validator from Boolean-only output to:
+  (validity, reason)
+- Added precise rejection reasons:
+  wrong number of octets
+  non numeric octet
+  octet outside 0-255
+- Unpacked the returned tuple using:
+  is_valid, reason = validate_ipv4(ip)
+- Used the returned reason in rejected_iocs.csv
+- Added:
+  if not ip:
+      continue
+  to skip blank input lines
