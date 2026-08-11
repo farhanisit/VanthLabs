@@ -81,3 +81,11 @@ Main lesson: validation protects the processing pipeline, while audit logging pr
   if not ip:
       continue
   to skip blank input lines
+
+## LNX-033 — Rejection Reason Summary
+
+- Used a dictionary to store reason → count.
+- .get(reason, 0) safely handles a missing key.
+- reason_counts[reason] = reason_counts.get(reason, 0) + 1 increments the count.
+- .items() gives both dictionary key and value.
+- rejection_summary.csv stores the final reason/count summary.

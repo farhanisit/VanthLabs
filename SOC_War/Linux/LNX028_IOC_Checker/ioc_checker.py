@@ -16,6 +16,7 @@ def validate_ipv4(ip):
 
 rejected_iocs = []
 observed_ips = set()
+reason_counts = {}
 
 with open("observed_ips.txt") as file:
     for line in file:
@@ -28,6 +29,7 @@ with open("observed_ips.txt") as file:
             observed_ips.add(ip)
         else:
             rejected_iocs.append((ip, "observed_ips.txt", reason))
+            reason_counts[reason] = reason_counts.get(reason, 0) + 1
 malicious_iocs = set()
 
 with open("malicious_iocs.txt") as file:
@@ -40,6 +42,7 @@ with open("malicious_iocs.txt") as file:
             malicious_iocs.add(ip)
         else:
             rejected_iocs.append((ip, "malicious_iocs.txt", reason))
+            reason_counts[reason] = reason_counts.get(reason, 0) + 1
 
 with open("ioc_report.csv", "w", newline="") as report:
     writer = csv.writer(report, lineterminator="\n")
@@ -62,3 +65,9 @@ with open("rejected_iocs.csv", "w", newline="") as report:
         writer.writerow(record)
 
 
+with open("rejection_summary.csv", "w", newline="") as file:
+    writer = csv.writer(file, lineterminator="\n")
+    writer.writerow(["reason", "count"])
+
+    for reason, count in reason_counts.items():
+        writer.writerow([reason, count])
