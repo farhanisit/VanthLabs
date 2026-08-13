@@ -89,3 +89,19 @@ Main lesson: validation protects the processing pipeline, while audit logging pr
 - reason_counts[reason] = reason_counts.get(reason, 0) + 1 increments the count.
 - .items() gives both dictionary key and value.
 - rejection_summary.csv stores the final reason/count summary.
+
+## LNX-034 — Source-Aware Rejection Summary
+
+Investigative question:
+Which input source is producing which rejection reason?
+
+- Added source_reason_counts = {}.
+- Used a tuple key:
+  (source, reason)
+  so the same rejection reason from different files is counted separately.
+- Updated both input loops to increment source-aware counts.
+- Used source_reason_counts.items() to unpack:
+  ((source, reason), count)
+- Created source_rejection_summary.csv with:
+  source,reason,count
+- Verified that observed_ips.txt and malicious_iocs.txt produce separate summary rows.
