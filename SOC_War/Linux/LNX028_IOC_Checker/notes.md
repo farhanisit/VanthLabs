@@ -105,3 +105,14 @@ Which input source is producing which rejection reason?
 - Created source_rejection_summary.csv with:
   source,reason,count
 - Verified that observed_ips.txt and malicious_iocs.txt produce separate summary rows.
+
+## LNX-035 — Sorting the Source-Aware Summary
+
+Investigative question:
+Can the source-aware rejection summary be presented in a predictable analyst-friendly order?
+
+- Wrapped source_reason_counts.items() with sorted().
+- Python sorts the tuple key left to right:
+  source first, then reason.
+- This groups all rejection reasons under each source consistently.
+- Verified sorted output in source_rejection_summary.csv.
