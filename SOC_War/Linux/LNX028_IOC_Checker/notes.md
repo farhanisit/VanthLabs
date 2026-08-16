@@ -116,3 +116,16 @@ Can the source-aware rejection summary be presented in a predictable analyst-fri
   source first, then reason.
 - This groups all rejection reasons under each source consistently.
 - Verified sorted output in source_rejection_summary.csv.
+
+## LNX-036 — Rank Source-Aware Rejections by Count
+
+Investigative question:
+Can the source-aware rejection summary show the most frequent problems first?
+
+- Used a custom sort key:
+  key=lambda item: item[1]
+- item[1] is the count in:
+  ((source, reason), count)
+- Added reverse=True for highest-to-lowest ordering.
+- This ranks the most frequent source/reason combinations first.
+- Verified that a count of 3 appears above counts of 1.

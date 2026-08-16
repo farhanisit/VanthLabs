@@ -80,5 +80,9 @@ with open("source_rejection_summary.csv", "w", newline="") as file:
     writer = csv.writer(file, lineterminator="\n")
     writer.writerow(["source", "reason", "count"])
 
-    for ((source, reason), count) in sorted(source_reason_counts.items()):
+    for ((source, reason), count) in sorted(
+        source_reason_counts.items(),
+        key=lambda item: item[1],
+        reverse=True
+    ):
         writer.writerow([source, reason, count])
