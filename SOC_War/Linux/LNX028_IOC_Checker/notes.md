@@ -129,3 +129,19 @@ Can the source-aware rejection summary show the most frequent problems first?
 - Added reverse=True for highest-to-lowest ordering.
 - This ranks the most frequent source/reason combinations first.
 - Verified that a count of 3 appears above counts of 1.
+
+## LNX-037 — Threshold-Based Analyst Flagging
+
+Investigative question:
+Can the source-aware rejection summary automatically flag high-frequency rejection buckets for analyst attention?
+
+- Added a threshold rule:
+  count >= 3
+- If the threshold is met:
+  status = "HIGH"
+- Otherwise:
+  status = "NORMAL"
+- Added a status column to source_rejection_summary.csv.
+- Verified:
+  count 3 -> HIGH
+  count 1 -> NORMAL

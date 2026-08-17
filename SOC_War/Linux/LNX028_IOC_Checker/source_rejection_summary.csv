@@ -1,1 +1,3 @@
-source,reason,count
+source,reason,count,status
+observed_ips.txt,non numeric octet,3,HIGH
+malicious_iocs.txt,wrong number of octets,1,NORMAL
